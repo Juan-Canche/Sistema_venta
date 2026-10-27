@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="Sistema de ventas web con HTML, Bootstrap y JavaScript moderno." />
+    <title>Sistema de Ventas</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/styles.css" />
+  </head>
+  <body class="bg-body-tertiary">
+    <header>
+      <nav class="navbar navbar-dark bg-dark">
+        <div class="container">
+          <a class="navbar-brand fw-semibold" href="#">Sistema de Ventas</a>
+          <span class="navbar-text small text-white-50 d-none d-md-inline" id="nav-date"></span>
+        </div>
+      </nav>
+    </header>
+
+    <main class="container py-4">
+      <section class="row g-3 mb-4" id="dashboard-cards" aria-label="Resumen del día"></section>
+
+      <ul class="nav nav-tabs" id="main-tabs" role="tablist">
+        <li class="nav-item" role="presentation">
+          <button
+            class="nav-link active"
+            id="tab-pos"
+            data-bs-toggle="tab"
+            data-bs-target="#panel-pos"
+            type="button"
+            role="tab"
+            aria-controls="panel-pos"
+            aria-selected="true"
+          >
+            Punto de venta
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button
+            class="nav-link"
+            id="tab-products"
+            data-bs-toggle="tab"
+            data-bs-target="#panel-products"
+            type="button"
+            role="tab"
+            aria-controls="panel-products"
+            aria-selected="false"
+          >
+            Productos
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button
+            class="nav-link"
+            id="tab-history"
+            data-bs-toggle="tab"
+            data-bs-target="#panel-history"
+            type="button"
+            role="tab"
+            aria-controls="panel-history"
+            aria-selected="false"
+          >
+            Historial
+          </button>
+        </li>
+      </ul>
+
+      <div class="tab-content bg-white border border-top-0 rounded-bottom p-3 p-lg-4" id="main-tab-content">
+        <section
+          class="tab-pane fade show active"
+          id="panel-pos"
+          role="tabpanel"
+          aria-labelledby="tab-pos"
+          tabindex="0"
+        >
+          <div class="row g-4">
+            <div class="col-lg-7">
+              <div class="d-flex flex-column flex-sm-row gap-2 align-items-sm-end justify-content-between mb-3">
+                <div>
+                  <h2 class="h4 mb-1">Catálogo</h2>
+                  <p class="text-muted small mb-0">Selecciona productos para agregarlos al carrito.</p>
+                </div>
+                <div class="d-flex gap-2 w-100 w-sm-auto">
+                  <div class="flex-grow-1">
+                    <label for="catalog-search" class="visually-hidden">Buscar producto</label>
+                    <input
+                      type="search"
+                      class="form-control"
+                      id="catalog-search"
+                      placeholder="Buscar por nombre o SKU"
+                    />
+                  </div>
+                  <div>
+                    <label for="catalog-category" class="visually-hidden">Filtrar por categoría</label>
+                    <select class="form-select" id="catalog-category">
+                      <option value="">Todas</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row g-3" id="catalog-grid"></div>
+              <p class="text-muted text-center py-4 d-none" id="catalog-empty">
+                No hay productos que coincidan con la búsqueda.
+              </p>
+            </div>
+
+            <div class="col-lg-5">
+              <div class="card shadow-sm cart-card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                  <h2 class="h5 mb-0">Carrito</h2>
+                  <button type="button" class="btn btn-sm btn-outline-danger" id="clear-cart">
+                    Vaciar
+                  </button>
+                </div>
+                <div class="card-body">
+                  <p class="text-muted mb-0" id="cart-empty">El carrito está vacío.</p>
+                  <ul class="list-group list-group-flush mb-3" id="cart-items"></ul>
+
+                  <div class="d-flex justify-content-between mb-2">
+                    <span>Subtotal</span>
+                    <span id="cart-subtotal">$0.00</span>
+                  </div>
+                  <div class="d-flex justify-content-between align-items-center mb-2">
+                    <label class="form-label mb-0" for="tax-rate">IVA (%)</label>
+                    <input
+                      type="number"
+                      class="form-control form-control-sm w-auto"
+                      id="tax-rate"
+                      min="0"
+                      max="100"
+                      step="0.01"
+                    />
+                  </div>
+                  <div class="d-flex justify-content-between mb-2">
+                    <span>Impuesto</span>
+                    <span id="cart-tax">$0.00</span>
+                  </div>
+                  <div class="d-flex justify-content-between fs-5 fw-bold border-top pt-2 mb-3">
+                    <span>Total</span>
+                    <span id="cart-total">$0.00</span>
+                  </div>
+
+                  <div class="mb-2">
+                    <label class="form-label" for="payment-method">Método de pago</label>
+                    <select class="form-select" id="payment-method">
+                      <option value="cash">Efectivo</option>
+                      <option value="card">Tarjeta</option>
+                    </select>
+                  </div>
+                  <div class="mb-2" id="cash-field">
+                    <label class="form-label" for="cash-received">Efectivo recibido</label>
+                    <input
+                      type="number"
+                      class="form-control"
+                      id="cash-received"
+                      min="0"
+                      step="0.01"
+                      placeholder="0.00"
+                    />
+                  </div>
+                  <div class="d-flex justify-content-between mb-3 d-none" id="change-row">
+                    <span>Cambio</span>
+                    <span class="fw-semibold" id="cash-change">$0.00</span>
+                  </div>
+
+                  <button type="button" class="btn btn-success w-100" id="checkout-button" disabled>
+                    Cobrar
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section
+          class="tab-pane fade"
+          id="panel-products"
+          role="tabpanel"
+          aria-labelledby="tab-products"
+          tabindex="0"
+        >
+          <div class="row g-4">
+            <div class="col-lg-4">
+              <div class="card shadow-sm">
+                <div class="card-header">
+                  <h2 class="h5 mb-0" id="product-form-title">Nuevo producto</h2>
+                </div>
+                <div class="card-body">
+                  <div class="alert alert-danger d-none" id="product-form-errors" role="alert"></div>
+                  <form id="product-form" novalidate>
+                    <input type="hidden" id="product-id" />
+                    <div class="mb-3">
+                      <label class="form-label" for="product-name">Nombre</label>
+                      <input type="text" class="form-control" id="product-name" maxlength="80" />
+                    </div>
+                    <div class="mb-3">
+                      <label class="form-label" for="product-sku">SKU</label>
+                      <input type="text" class="form-control" id="product-sku" maxlength="40" />
+                    </div>
+                    <div class="row g-2">
+                      <div class="col-6 mb-3">
+                        <label class="form-label" for="product-price">Precio</label>
+                        <input
+                          type="number"
+                          class="form-control"
+                          id="product-price"
+                          min="0"
+                          step="0.01"
+                        />
+                      </div>
+                      <div class="col-6 mb-3">
+                        <label class="form-label" for="product-stock">Stock</label>
+                        <input type="number" class="form-control" id="product-stock" min="0" step="1" />
+                      </div>
+                    </div>
+                    <div class="mb-3">
+                      <label class="form-label" for="product-category">Categoría</label>
+                      <input type="text" class="form-control" id="product-category" maxlength="40" />
+                    </div>
+                    <div class="mb-3">
+                      <label class="form-label" for="product-image">Imagen (URL opcional)</label>
+                      <input type="url" class="form-control" id="product-image" placeholder="https://..." />
+                    </div>
+                    <div class="d-flex gap-2">
+                      <button type="submit" class="btn btn-primary flex-grow-1" id="product-submit">
+                        Guardar producto
+                      </button>
+                      <button type="button" class="btn btn-outline-secondary d-none" id="product-cancel">
+                        Cancelar
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-lg-8">
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <h2 class="h4 mb-0">Inventario</h2>
+                <span class="badge text-bg-secondary" id="products-count">0 productos</span>
+              </div>
+              <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                  <thead class="table-light">
+                    <tr>
+                      <th scope="col">Producto</th>
+                      <th scope="col">SKU</th>
+                      <th scope="col">Categoría</th>
+                      <th scope="col" class="text-end">Precio</th>
+                      <th scope="col" class="text-center">Stock</th>
+                      <th scope="col" class="text-end">Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody id="products-table-body"></tbody>
+                </table>
+              </div>
+              <p class="text-muted text-center py-4 d-none" id="products-empty">
+                No hay productos registrados.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section
+          class="tab-pane fade"
+          id="panel-history"
+          role="tabpanel"
+          aria-labelledby="tab-history"
+          tabindex="0"
+        >
+          <div class="d-flex flex-column flex-md-row gap-2 justify-content-between align-items-md-end mb-3">
+            <div>
+              <h2 class="h4 mb-1">Historial de ventas</h2>
+              <p class="text-muted small mb-0" id="history-summary">Sin ventas registradas.</p>
+            </div>
+            <div class="d-flex flex-wrap gap-2 align-items-end">
+              <div>
+                <label class="form-label small mb-1" for="history-from">Desde</label>
+                <input type="date" class="form-control form-control-sm" id="history-from" />
+              </div>
+              <div>
+                <label class="form-label small mb-1" for="history-to">Hasta</label>
+                <input type="date" class="form-control form-control-sm" id="history-to" />
+              </div>
+              <button type="button" class="btn btn-sm btn-outline-secondary" id="history-clear">
+                Limpiar
+              </button>
+            </div>
+          </div>
+
+          <div class="table-responsive">
+            <table class="table table-hover align-middle">
+              <thead class="table-light">
+                <tr>
+                  <th scope="col">Folio</th>
+                  <th scope="col">Fecha</th>
+                  <th scope="col" class="text-center">Artículos</th>
+                  <th scope="col">Pago</th>
+                  <th scope="col" class="text-end">Total</th>
+                  <th scope="col" class="text-end">Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="sales-table-body"></tbody>
+            </table>
+          </div>
+          <p class="text-muted text-center py-4 d-none" id="sales-empty">
+            No hay ventas en el periodo seleccionado.
+          </p>
+        </section>
+      </div>
+    </main>
+
+    <div
+      class="modal fade"
+      id="receipt-modal"
+      tabindex="-1"
+      aria-labelledby="receipt-modal-title"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-dialog-scrollable">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h2 class="modal-title fs-5" id="receipt-modal-title">Ticket de venta</h2>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+          </div>
+          <div class="modal-body" id="receipt-content"></div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+              Cerrar
+            </button>
+            <button type="button" class="btn btn-primary" id="print-receipt">Imprimir</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="toast-container position-fixed bottom-0 end-0 p-3" id="toast-container"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="module" src="js/main.js"></script>
+  </body>
+</html>
